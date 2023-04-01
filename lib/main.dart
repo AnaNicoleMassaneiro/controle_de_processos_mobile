@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         '/list-clients': (context) => const ClientsList(),
         '/add-clients': (context) => const ClientAddEdit(),
         '/edit-clients': (context) => const ClientAddEdit(),
-        '/novo-pedido': (context) => NovoPedido(),
+        '/novo-pedido': (context) => NewOrderScreen(),
       },
 
     );

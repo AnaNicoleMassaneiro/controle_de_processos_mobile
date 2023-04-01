@@ -1,41 +1,66 @@
 import 'package:flutter/material.dart';
 import '../../api/api_register_product.dart';
+
 import '../../model/product_model.dart';
 
-class NovoPedido extends StatefulWidget {
+class NewOrderScreen extends StatefulWidget {
   @override
-  _NovoPedidoState createState() => _NovoPedidoState();
+  _NewOrderScreenState createState() => _NewOrderScreenState();
 }
 
-class _NovoPedidoState extends State<NovoPedido> {
-  int _indiceAtual = 2;
-  List<ProductModel> _products = [];
+class _NewOrderScreenState extends State<NewOrderScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _cpfController = TextEditingController();
+  final _quantityController = TextEditingController();
+
+  late List<ProductModel> _products;
   ProductModel? _selectedProduct;
   int? _selectedProductQuantity;
-  late String _cpfCliente;
-  List<String> _produtosSelecionados = [];
-  int _quantidade = 1;
-  final List<String> _produtosDisponiveis = [];
 
-  final _cpfController = TextEditingController();
-  final _quantidadeController = TextEditingController();
-
-  @override
-  void dispose() {
-    _cpfController.dispose();
-    _quantidadeController.dispose();
-    super.dispose();
+  Future<List<ProductModel>?> _getProducts() async {
+    return apiRegister.getProducts();
   }
 
-  void onTabTapped(int index) {
-    switch(index){
-      case 1:
-        Navigator.pushNamed(context, "/list-clients");
-        break;
-    }
-    setState(() {
-      _indiceAtual = index;
+  @override
+  void initState() {
+    super.initState();
+    _getProducts().then((products) {
+      setState(() {
+        _products = products!;
+      });
     });
+  }
+
+  Widget _buildProductDropdownButton() {
+    return DropdownButton<ProductModel>(
+      isExpanded: true,
+      isDense: true,
+      value: _selectedProduct,
+      hint: Text('Selecione um produto'),
+      onChanged: (ProductModel? value) {
+        setState(() {
+          _selectedProduct = value;
+          _selectedProductQuantity = null;
+        });
+      },
+      items: _products.map((product) {
+        return DropdownMenuItem<ProductModel>(
+          value: product,
+          child: Text(
+            product.descricao,
+            softWrap: true,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _handleAddProduct() {
+    if (_selectedProduct != null && _selectedProductQuantity != null) {
+      // Implementar a lógica para adicionar o produto ao pedido do cliente
+    }
   }
 
   @override
@@ -45,127 +70,63 @@ class _NovoPedidoState extends State<NovoPedido> {
         title: Text('Novo Pedido'),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('CPF do cliente:'),
-                TextField(
+                TextFormField(
                   controller: _cpfController,
-                  onChanged: (value) {
-                    setState(() {
-                      _cpfCliente = value;
-                    });
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'CPF do Cliente',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo obrigatório';
+                    }
+                    // Implementar a validação do CPF
+                    return null;
                   },
                 ),
-                SizedBox(height: 5.0),
-                Text('Produtos selecionados:'),
-                Container(
-                  height: 20.0, // altura específica
-                  child: ListView.builder(
-                    itemCount: _produtosSelecionados.length,
-                    itemBuilder: (context, index) {
-                      final produto = _produtosSelecionados[index];
-                      return ListTile(
-                        title: Text(produto),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            setState(() {
-                              _produtosSelecionados.removeAt(index);
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Text('Adicionar produto:'),
-                Container(
-                  child: SingleChildScrollView(
-                    child: FutureBuilder<List<ProductModel>?>(
-                    future: getProducts(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        _products = snapshot.data!;
-                        return buildDropdownButton();
-                      } else if (snapshot.hasError) {
-                        return Text('Erro ao carregar produtos: ${snapshot.error}');
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    },
-                  ),),
-                ),
                 SizedBox(height: 16.0),
-                Text('Quantidade:'),
-                TextField(
-                  controller: _quantidadeController,
+                _buildProductDropdownButton(),
+                SizedBox(height: 16.0),
+                TextFormField(
+                  controller: _quantityController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Quantidade',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo obrigatório';
+                    }
+                    // Implementar a validação da quantidade
+                    return null;
+                  },
                   onChanged: (value) {
                     setState(() {
-                      _quantidade = int.parse(value);
+                      _selectedProductQuantity = int.tryParse(value);
                     });
                   },
                 ),
                 SizedBox(height: 16.0),
-                Center(
-                  child: ElevatedButton(
-                    child: Text('Salvar'),
-                    onPressed: () {
-                      // salvar o pedido
-                    },
-                  ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _handleAddProduct();
+                    }
+                  },
+                  child: Text('Adicionar Produto'),
                 ),
               ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: onTabTapped,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.production_quantity_limits),
-              label: "Produtos"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Clientes"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_basket),
-              label: "Pedidos"
-          ),
-        ],
-      ),
     );
-  }
-
-  Widget buildDropdownButton() {
-    List<ProductModel> uniqueProducts = _products.toSet().toList();
-    return DropdownButton<ProductModel>(
-      value: _selectedProduct,
-      onChanged: (value) {
-        setState(() {
-          _selectedProduct = value;
-        });
-      },
-      items: uniqueProducts.map<DropdownMenuItem<ProductModel>>((ProductModel product) {
-        return DropdownMenuItem<ProductModel>(
-          value: product,
-          child: Text(product.descricao),
-        );
-      }).toList(),
-    );
-  }
-
-  Future<List<ProductModel>?> getProducts() async {
-    return apiRegister.getProducts();
   }
 }
