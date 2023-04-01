@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 
 import '../../api/api_register_product.dart';
-import '../../api/api_service.dart';
 import '../../model/product_model.dart';
 
 class ProductsList extends StatefulWidget {
@@ -59,7 +58,7 @@ class _ProductsListState extends State<ProductsList> {
 
   Widget loadProducts() {
     return FutureBuilder(
-      future: APIService.getProducts(),
+      future: apiRegister.getProducts(),
       builder: (
           BuildContext context,
           AsyncSnapshot<List<ProductModel>?> model,
@@ -79,6 +78,9 @@ class _ProductsListState extends State<ProductsList> {
     switch(index){
       case 1:
         Navigator.pushNamed(context, "/list-clients");
+        break;
+      case 2:
+        Navigator.pushNamed(context, "/novo-pedido");
         break;
     }
     setState(() {

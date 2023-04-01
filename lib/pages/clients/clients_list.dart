@@ -77,7 +77,7 @@ class _ClientsListState extends State<ClientsList> {
   void onTabTapped(int index) {
     switch(index){
       case 2:
-        Navigator.pushNamed(context, "/list-clients");
+        Navigator.pushNamed(context, "/novo-pedido");
         break;
     }
     setState(() {

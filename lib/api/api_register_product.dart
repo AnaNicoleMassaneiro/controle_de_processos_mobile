@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 import '../config.dart';
 import '../model/product_model.dart';
 
 class apiRegister {
+  static var client = http.Client();
+
   Future<http.Response> create(ProductModel model) async {
     return http.post(
       Uri.parse('http://localhost:8080/product'),
@@ -47,6 +48,32 @@ class apiRegister {
         'id': model.id.toString(),
       }),
     );
+  }
+
+  static Future<List<ProductModel>?> getProducts() async {
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    var url = Uri.http(
+      Config.apiURL,
+      Config.productsAPI,
+    );
+
+    var response = await client.get(
+      url,
+      headers: requestHeaders,
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      return productsFromJson(data);
+
+      //return true;
+    } else {
+      return null;
+    }
   }
 
 }

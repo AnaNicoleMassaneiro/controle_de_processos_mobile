@@ -2,6 +2,7 @@ import 'package:controle_de_processos_mobile/pages/clients/clients_add_edit.dart
 import 'package:controle_de_processos_mobile/pages/clients/clients_list.dart';
 import 'package:controle_de_processos_mobile/pages/products/product_add_edit.dart';
 import 'package:controle_de_processos_mobile/pages/products/product_list.dart';
+import 'package:controle_de_processos_mobile/pages/request/novo_pedido.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         '/list-clients': (context) => const ClientsList(),
         '/add-clients': (context) => const ClientAddEdit(),
         '/edit-clients': (context) => const ClientAddEdit(),
+        '/novo-pedido': (context) => NovoPedido(),
       },
 
     );
