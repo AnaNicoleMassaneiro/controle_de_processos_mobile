@@ -2,11 +2,11 @@ List<ProductModel> productsFromJson(dynamic str) =>
     List<ProductModel>.from((str).map((x) => ProductModel.fromJson(x)));
 
 class ProductModel {
-  late int? id;
+  late int id;
   late String descricao;
 
   ProductModel({
-    this.id,
+    required this.id,
     required this.descricao
   });
 

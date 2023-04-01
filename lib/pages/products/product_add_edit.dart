@@ -52,7 +52,7 @@ class _ProductAddEditState extends State<ProductAddEdit> {
   @override
   void initState() {
     super.initState();
-    productModel = ProductModel(descricao: '');
+    productModel = ProductModel(descricao: '', id: 0);
 
     Future.delayed(Duration.zero, () {
       if (ModalRoute.of(context)?.settings.arguments != null) {

@@ -66,7 +66,6 @@ class _ClientsListState extends State<ClientsList> {
         if (model.hasData) {
           return clientsList(model.data);
         }
-
         return const Center(
           child: CircularProgressIndicator(),
         );
