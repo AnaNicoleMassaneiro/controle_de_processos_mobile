@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 
 import '../../api/api_register_product.dart';
+import '../../components/bottom_navigation.dart';
 import '../../model/product_model.dart';
 
 class ProductsList extends StatefulWidget {
@@ -13,7 +14,13 @@ class ProductsList extends StatefulWidget {
 }
 
 class _ProductsListState extends State<ProductsList> {
-  int _indiceAtual = 0;
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   bool isApiCallProcess = false;
   @override
@@ -35,23 +42,9 @@ class _ProductsListState extends State<ProductsList> {
         opacity: 0.3,
         key: UniqueKey(),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: onTabTapped,
-        items: const [
-          BottomNavigationBarItem(
-                icon: Icon(Icons.production_quantity_limits),
-              label: "Produtos"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Clientes"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_basket),
-              label: "Pedidos"
-          ),
-        ],
+      bottomNavigationBar: MyBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -83,9 +76,7 @@ class _ProductsListState extends State<ProductsList> {
         Navigator.pushNamed(context, "/novo-pedido");
         break;
     }
-    setState(() {
-      _indiceAtual = index;
-    });
+
   }
 
   Widget productList(products) {

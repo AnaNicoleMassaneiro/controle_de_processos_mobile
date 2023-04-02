@@ -80,4 +80,30 @@ class APIClientsService {
       }),
     );
   }
+
+  static Future<List<ClientsModel>?> getClientsId() async {
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    var url = Uri.http(
+      Config.apiURL,
+      Config.clientsAPI,
+    );
+
+    var response = await client.get(
+      url,
+      headers: requestHeaders,
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      return clientsFromJson(data);
+
+      //return true;
+    } else {
+      return null;
+    }
+  }
 }

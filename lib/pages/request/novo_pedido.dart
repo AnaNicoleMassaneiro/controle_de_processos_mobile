@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../api/api_register_product.dart';
 
+import '../../components/bottom_navigation.dart';
+import '../../model/Request_model.dart';
 import '../../model/product_model.dart';
 
 class NewOrderScreen extends StatefulWidget {
@@ -12,8 +14,15 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
   final _formKey = GlobalKey<FormState>();
   final _cpfController = TextEditingController();
   final _quantityController = TextEditingController();
+  List<RequestModel> _selectedProducts = [];
+  int _selectedIndex = 2;
 
-  late List<ProductModel> _products;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+  List<ProductModel> _products = [];
   ProductModel? _selectedProduct;
   int? _selectedProductQuantity;
 
@@ -28,6 +37,17 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
       setState(() {
         _products = products!;
       });
+    });
+  }
+
+  void onTabTapped(int index) {
+    switch(index){
+      case 1:
+        Navigator.pushNamed(context, "/list-clients");
+        break;
+    }
+    setState(() {
+     // _indiceAtual = index;
     });
   }
 
@@ -58,9 +78,15 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
   }
 
   void _handleAddProduct() {
-    if (_selectedProduct != null && _selectedProductQuantity != null) {
-      // Implementar a lógica para adicionar o produto ao pedido do cliente
+    if (_selectedProduct == null || _selectedProductQuantity == null) {
+      return;
     }
+
+    setState(() {
+      _selectedProducts.add(RequestModel(id: 0, desc: 'banana', qtd: int.parse(_quantityController.text)));
+    });
+
+    print(_selectedProducts);
   }
 
   @override
@@ -78,7 +104,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
-                  controller: _cpfController,
+                    controller: _cpfController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: 'CPF do Cliente',
@@ -126,6 +152,10 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: MyBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }

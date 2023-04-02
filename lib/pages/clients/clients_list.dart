@@ -2,6 +2,7 @@ import 'package:controle_de_processos_mobile/api/clients_service.dart';
 import 'package:flutter/material.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 
+import '../../components/bottom_navigation.dart';
 import '../../model/clients_model.dart';
 import 'clients_item.dart';
 
@@ -13,7 +14,14 @@ class ClientsList extends StatefulWidget {
 }
 
 class _ClientsListState extends State<ClientsList> {
-  int _indiceAtual = 1;
+
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   bool isApiCallProcess = false;
   @override
@@ -35,23 +43,9 @@ class _ClientsListState extends State<ClientsList> {
         opacity: 0.3,
         key: UniqueKey(),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: onTabTapped,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.production_quantity_limits),
-              label: "Produtos"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Clientes"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_basket),
-              label: "Pedidos"
-          ),
-        ],
+      bottomNavigationBar: MyBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
@@ -80,7 +74,7 @@ class _ClientsListState extends State<ClientsList> {
         break;
     }
     setState(() {
-      _indiceAtual = index;
+      //_indiceAtual = index;
     });
   }
 
