@@ -81,7 +81,7 @@ class APIClientsService {
     );
   }
 
-  static Future<ClientsModel?> getClientsByCcf(String cpf) async {
+  static Future<ClientsModel?> getClientsById(String cpf) async {
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
     };
@@ -97,7 +97,7 @@ class APIClientsService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return ClientsModel.fromJson(jsonDecode(response.body));
     } else {
       return null;
     }

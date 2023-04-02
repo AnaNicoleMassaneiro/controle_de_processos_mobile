@@ -1,7 +1,9 @@
 import 'package:controle_de_processos_mobile/api/clients_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import '../../api/api_register_product.dart';
 
+import '../../api/request_service.dart';
 import '../../components/bottom_navigation.dart';
 import '../../model/Request_model.dart';
 import '../../model/product_model.dart';
@@ -22,6 +24,10 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     mask: '###.###.###-##',
     filter: {"#": RegExp(r'[0-9]')},
   );
+
+  get id => null;
+
+  get desc => null;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -83,24 +89,62 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     );
   }
 
-  void _handleAddProduct() {
+  Future<void> _handleAddProduct() async {
     if (_selectedProduct == null || _selectedProductQuantity == null) {
       return;
     }
-
-    setState(() {
-      _selectedProducts.add(RequestModel(id: 0, desc: 'banana', qtd: int.parse(_quantityController.text)));
-    });
-
     final cleanValue = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
 
-    var idClient = APIClientsService.getClientsByCcf(cleanValue);
+    var idClient = await APIClientsService.getClientsById(cleanValue);
+    ProductModel? selectedProduct = _selectedProduct;
 
-    print(idClient);
+    print(selectedProduct);
+    print(_selectedProductQuantity);
+
+    List<RequestModel> selectedProducts = [];
+
+    selectedProducts.add(RequestModel(
+      desc: selectedProduct?.descricao ?? '',
+      id_client: idClient?.id,
+      qtd: int.parse(_quantityController.text),
+    ));
+
+    APIRequestService apiService = APIRequestService();
+    Response ret = await apiService.create(selectedProducts);
 
 
+    print(ret.body);
 
+    if(!ret.body.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Produto adicionado com sucesso'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+        title: Text('Erro ao adicionar produto'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+      );
+    }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
