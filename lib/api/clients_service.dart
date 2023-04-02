@@ -81,14 +81,14 @@ class APIClientsService {
     );
   }
 
-  static Future<List<ClientsModel>?> getClientsId() async {
+  static Future<ClientsModel?> getClientsByCcf(String cpf) async {
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
     };
 
     var url = Uri.http(
       Config.apiURL,
-      Config.clientsAPI,
+      '${Config.clientsAPI}/$cpf',
     );
 
     var response = await client.get(
@@ -97,13 +97,10 @@ class APIClientsService {
     );
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-
-      return clientsFromJson(data);
-
-      //return true;
+      return jsonDecode(response.body);
     } else {
       return null;
     }
   }
+
 }

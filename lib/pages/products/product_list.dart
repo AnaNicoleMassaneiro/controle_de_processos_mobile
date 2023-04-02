@@ -32,7 +32,7 @@ class _ProductsListState extends State<ProductsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Controle de Processos'),
+        title: const Text('Lista de Produtos'),
         elevation: 0,
       ),
       backgroundColor: Colors.grey[200],

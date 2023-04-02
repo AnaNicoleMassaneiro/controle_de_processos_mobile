@@ -33,7 +33,7 @@ class _ClientsListState extends State<ClientsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Controle de Processos'),
+        title: const Text('Lista de Clientes'),
         elevation: 0,
       ),
       backgroundColor: Colors.grey[200],
