@@ -112,9 +112,6 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     APIRequestService apiService = APIRequestService();
     Response ret = await apiService.create(selectedProducts);
 
-
-    print(ret.body);
-
     if(!ret.body.isEmpty) {
       showDialog(
         context: context,
@@ -200,6 +197,10 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
                   },
                   child: const Text('Adicionar Produto'),
                 ),
+                ElevatedButton(
+                  onPressed: _handleShowOrders,
+                  child: Text('Mostrar Pedidos'),
+                ),
               ],
             ),
           ),
@@ -212,6 +213,51 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     );
 
   }
+
+  void _handleShowOrders() async {
+    final cleanValue = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
+    var idClient = await APIClientsService.getClientsById(cleanValue);
+    if (idClient != null) {
+      APIRequestService apiService = APIRequestService();
+      List<RequestModel> requests = await apiService.getRequestsByClientId(idClient.id ?? 0);
+
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Pedidos do Cliente'),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: requests.length,
+              itemBuilder: (context, index) {
+                RequestModel request = requests[index];
+                return ListTile(
+                  title: Text(request.desc),
+                  subtitle: Text('Quantidade: ${request.qtd}'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Erro'),
+          content: Text('Cliente não encontrado'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
 
   String? validateCpf(String? value) {
     if (value == null || value.isEmpty) {
