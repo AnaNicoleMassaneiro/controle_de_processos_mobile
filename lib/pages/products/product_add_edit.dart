@@ -76,10 +76,9 @@ class _ProductAddEditState extends State<ProductAddEdit> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
+            child: TextFormField(
               controller: myController,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
                 hintText: 'Descrição',
               ),
             ),
@@ -104,7 +103,7 @@ class _ProductAddEditState extends State<ProductAddEdit> {
                     ret = await api.create(productModel!);
                   }
 
-                  if (ret.statusCode == 204) {
+                  if (ret.statusCode == 201 || ret.statusCode == 204) {
                     setState(() {
                       isApiCallProcess = false;
                     });

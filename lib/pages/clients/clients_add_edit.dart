@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/src/response.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:snippet_coder_utils/FormHelper.dart';
 import 'package:snippet_coder_utils/ProgressHUD.dart';
 import 'package:snippet_coder_utils/hex_color.dart';
@@ -24,6 +25,10 @@ class _ClientAddEditState extends State<ClientAddEdit> {
   List<Object> images = [];
   bool isEditMode = false;
   bool isImageSelected = false;
+  final cpfMaskFormatter = MaskTextInputFormatter(
+    mask: '###.###.###-##',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
 
   final cpfController = TextEditingController();
   final nameController = TextEditingController();
@@ -80,30 +85,31 @@ class _ClientAddEditState extends State<ClientAddEdit> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
+            child: TextFormField(
               controller: cpfController,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'CPF',
+                labelText: 'CPF do Cliente',
               ),
+              validator: validateCpf,
+              inputFormatters: [cpfMaskFormatter],
             ),
+
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
+            child: TextFormField(
               controller: nameController,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
                 hintText: 'Nome',
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: TextField(
+            child: TextFormField(
               controller: sobrenomeController,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
                 hintText: 'Sobrenome',
               ),
             ),
@@ -116,7 +122,6 @@ class _ClientAddEditState extends State<ClientAddEdit> {
                   clientModel?.name = nameController.text;
                   clientModel?.cpf = cpfController.text;
                   clientModel?.sobrenome = sobrenomeController.text;
-
 
                   setState(() {
                     isApiCallProcess = true;
@@ -131,7 +136,7 @@ class _ClientAddEditState extends State<ClientAddEdit> {
                     ret = await api.create(clientModel!);
                   }
 
-                  if (ret.statusCode == 201) {
+                  if (ret.statusCode == 201 || ret.statusCode == 204) {
                     setState(() {
                       isApiCallProcess = false;
                     });
@@ -182,6 +187,20 @@ class _ClientAddEditState extends State<ClientAddEdit> {
     // Clean up the controller when the widget is disposed.
     nameController.dispose();
     super.dispose();
+  }
+
+  String? validateCpf(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Campo obrigatório';
+    }
+
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+
+    if (cleanValue.length != 11) {
+      return 'CPF inválido';
+    }
+
+    return null;
   }
 
   isValidURL(url) {

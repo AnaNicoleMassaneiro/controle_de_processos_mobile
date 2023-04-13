@@ -28,12 +28,6 @@ class apiRegister {
       },
     );
 
-    if (response.statusCode == 204) {
-      print("Deleted");
-    } else {
-      throw "Sorry! Unable to delete this post.";
-    }
-
     return response;
   }
 

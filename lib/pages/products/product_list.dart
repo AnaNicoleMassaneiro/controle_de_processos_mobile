@@ -124,11 +124,30 @@ class _ProductsListState extends State<ProductsList> {
 
                       api.delete(model).then(
                             (response) {
-                          setState(() {
-                            isApiCallProcess = false;
-                          });
+                          if (response.statusCode == 500) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Erro'),
+                                  content: Text('Cliente não pode ser excluido pois possui registros em seu nome'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            setState(() {
+                              isApiCallProcess = false;
+                            });
+                          }
                         },
                       );
+
                     },
                   );
                 },

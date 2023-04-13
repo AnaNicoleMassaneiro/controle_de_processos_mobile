@@ -98,15 +98,13 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     var idClient = await APIClientsService.getClientsById(cleanValue);
     ProductModel? selectedProduct = _selectedProduct;
 
-    print(selectedProduct);
-    print(_selectedProductQuantity);
-
     List<RequestModel> selectedProducts = [];
 
     selectedProducts.add(RequestModel(
       desc: selectedProduct?.descricao ?? '',
       id_client: idClient?.id,
       qtd: int.parse(_quantityController.text),
+      id_product: selectedProduct?.id, name: null, sellerName: null, cpf: null,
     ));
 
     APIRequestService apiService = APIRequestService();
@@ -218,47 +216,50 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
     final cleanValue = _cpfController.text.replaceAll(RegExp(r'[^\d]'), '');
     var idClient = await APIClientsService.getClientsById(cleanValue);
     if (idClient != null) {
-      APIRequestService apiService = APIRequestService();
-      List<RequestModel> requests = await apiService.getRequestsByClientId(idClient.id ?? 0);
+      List<RequestModel> requests = [];
+      try {
+        requests = await APIRequestService.getRequestsByClientId(idClient.id ?? 0);
+      } catch (e) {
+        print('Erro ao carregar pedidos do cliente: $e');
+      }
 
-
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Pedidos do Cliente'),
-          content: Container(
-            width: double.maxFinite,
-            child: ListView.builder(
-              itemCount: requests.length,
-              itemBuilder: (context, index) {
-                RequestModel request = requests[index];
-                return ListTile(
-                  title: Text(request.desc),
-                  subtitle: Text('Quantidade: ${request.qtd}'),
-                );
-              },
+      if (requests.isNotEmpty) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Pedidos do Cliente'),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.builder(
+                itemCount: requests.length,
+                itemBuilder: (context, index) {
+                  RequestModel request = requests[index];
+                  return ListTile(
+                    title: Text(request.desc ?? ''),
+                    subtitle: Text('Quantidade: ${request.qtd}'),
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Erro'),
-          content: Text('Cliente não encontrado'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Erro'),
+            content: Text('Cliente não possui pedidos'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
-
-
   String? validateCpf(String? value) {
     if (value == null || value.isEmpty) {
       return 'Campo obrigatório';
@@ -272,5 +273,7 @@ class _NewOrderScreenState extends State<NewOrderScreen> {
 
     return null;
   }
+
+
 
 }

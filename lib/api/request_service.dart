@@ -23,21 +23,32 @@ class APIRequestService {
     );
   }
 
-  Future<List<RequestModel>> getRequestsByClientId(int clientId) async {
-    final response = await http.get(
-      Uri.parse('http://localhost:8080/request/$clientId'),
-    );
+  static Future<List<RequestModel>> getRequestsByClientId(int clientId) async {
+    final response =
+    await http.get(Uri.parse('http://localhost:8080/request/searchIdClient/$clientId'));
 
-    print(response);
-    print(response.body);
-    print(response.statusCode);
     if (response.statusCode == 200) {
-      final parsed = jsonDecode(response.body).cast<Map<String, dynamic>>();
-      return parsed.map<RequestModel>((json) => RequestModel.fromJson(json))
-          .toList();
+      var data = jsonDecode(response.body);
+      List<dynamic> requestsData = data[0];
+
+      List<RequestModel> requests = [];
+      for (var requestData in requestsData) {
+        RequestModel request = RequestModel(
+          desc: requestData[0],
+          name: requestData[1],
+          sellerName: requestData[2],
+          cpf: requestData[3],
+          qtd: int.parse(requestData[4]),
+        );
+        requests.add(request);
+      }
+
+      return requests;
     } else {
       throw Exception('Failed to load requests');
     }
   }
+
+
 }
 

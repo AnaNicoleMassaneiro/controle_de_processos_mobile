@@ -56,13 +56,6 @@ class APIClientsService {
       },
     );
 
-    if (response.statusCode == 204) {
-      print("Deleted");
-    } else {
-      print(response);
-      throw "Cliente nao pode ser excluido porque tem registros";
-    }
-
     return response;
   }
 
